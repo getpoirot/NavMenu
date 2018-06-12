@@ -7,6 +7,22 @@ use Poirot\Std\Interfaces\Pact\ipBuilder;
 use Poirot\Std\Interfaces\Pact\ipFactory;
 use Poirot\Std\Type\StdTravers;
 
+/*
+$navigation = BuildMenu::of([
+    'menus' => [
+        [
+            'class' => MenuUri::class,
+            'order' => 10,
+            'settings' => [
+                'href' => 'http://google.com',
+            ],
+        ],
+    ],
+    'default_settings' => [
+        'class' => 'menu-item',
+    ],
+], new NavigationMenu );
+*/
 
 class BuildMenu
     extends ConfigurableSetter
