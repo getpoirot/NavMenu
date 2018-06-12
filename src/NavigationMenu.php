@@ -1,5 +1,7 @@
 <?php
 namespace Poirot\NavMenu;
+use Poirot\NavMenu\Builder\BuildMenu;
+use Poirot\Std\Exceptions\exImmutable;
 use Poirot\Std\Struct\CollectionObject;
 
 
@@ -7,12 +9,13 @@ use Poirot\Std\Struct\CollectionObject;
  * Add Some Menu To Holder As Group Of Menus
  *
  */
-class GroupMenuHolder
+class NavigationMenu
     implements \Countable
     , \RecursiveIterator
 {
     /** @var PriorityObjectCollection */
     protected $collection;
+    protected $defaultSettings = [];
 
 
     /**
@@ -25,7 +28,18 @@ class GroupMenuHolder
      */
     function addMenu(aMenu $menu, $order = null)
     {
-        $this->collection->insert($menu, ['sort' => $order]);
+        ## Build Menu With Default Settings
+        #
+        BuildMenu::of(
+            $this->getDefaultSettings()
+            , $menu
+        );
+
+
+        ## Add Menu To Collection
+        #
+        $this->_collection()->insert($menu, ['sort' => $order]);
+
         return $this;
     }
 
@@ -52,6 +66,35 @@ class GroupMenuHolder
         return $this;
     }
 
+    /**
+     * Set Default Settings
+     *
+     * - some settings are default for container such as class, etc..
+     *
+     * @param array $settings
+     *
+     * @return $this
+     */
+    function giveDefaultSettings(array $settings)
+    {
+        if ( $this->defaultSettings )
+            throw new exImmutable('Default Settings Is Immutable.');
+
+
+        $this->defaultSettings = $settings;
+        return $this;
+    }
+
+    /**
+     * Get Default Settings
+     *
+     * @return array
+     */
+    function getDefaultSettings()
+    {
+        return $this->defaultSettings;
+    }
+
 
     // ..
 
@@ -76,7 +119,7 @@ class GroupMenuHolder
      */
     function current()
     {
-        $this->collection->current();
+        $this->_collection()->current();
     }
 
     /**
@@ -84,7 +127,7 @@ class GroupMenuHolder
      */
     function next()
     {
-        $this->collection->next();
+        $this->_collection()->next();
     }
 
     /**
@@ -92,7 +135,7 @@ class GroupMenuHolder
      */
     function key()
     {
-        $this->collection->key();
+        $this->_collection()->key();
     }
 
     /**
@@ -100,7 +143,7 @@ class GroupMenuHolder
      */
     function valid()
     {
-        $this->collection->valid();
+        $this->_collection()->valid();
     }
 
     /**
@@ -108,7 +151,7 @@ class GroupMenuHolder
      */
     function rewind()
     {
-        $this->collection->rewind();
+        $this->_collection()->rewind();
     }
 
     /**
@@ -135,6 +178,6 @@ class GroupMenuHolder
      */
     function count()
     {
-        $this->collection->count();
+        $this->_collection()->count();
     }
 }

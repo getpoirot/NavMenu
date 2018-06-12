@@ -5,7 +5,7 @@ use Poirot\Std\Type\StdString;
 
 
 abstract class aMenu
-    extends GroupMenuHolder
+    extends NavigationMenu
 {
     /** @var string Menu ID */
     protected $id;

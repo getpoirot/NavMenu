@@ -2,10 +2,12 @@
 namespace Poirot\NavMenu;
 
 use Poirot\Http\Interfaces\iHttpRequest;
+use Poirot\NavMenu\Interfaces\iMenuAwareRequest;
 
 
 class MenuUri
     extends aMenu
+    implements iMenuAwareRequest
 {
     /** @var string */
     protected $href;
@@ -72,9 +74,9 @@ class MenuUri
      *
      * @return $this
      */
-    function setHref(string $href)
+    function setHref($href)
     {
-        $this->href = $href;
+        $this->href = (string) $href;
         return $this;
     }
 

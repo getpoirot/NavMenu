@@ -2,6 +2,9 @@
 namespace Poirot\NavMenu;
 
 use Poirot\Http\Interfaces\iHttpRequest;
+use Poirot\NavMenu\Interfaces\iMenuAwareMatchedRoute;
+use Poirot\NavMenu\Interfaces\iMenuAwareRequest;
+use Poirot\NavMenu\Interfaces\iMenuAwareRouter;
 use Poirot\Router\Interfaces\iRoute;
 use Poirot\Router\Interfaces\iRouterStack;
 use Poirot\Std\Type\StdTravers;
@@ -9,6 +12,9 @@ use Poirot\Std\Type\StdTravers;
 
 class MenuRoute
     extends aMenu
+    implements iMenuAwareRouter
+    , iMenuAwareMatchedRoute
+    , iMenuAwareRequest
 {
     /** @var iRouterStack */
     protected $router;
