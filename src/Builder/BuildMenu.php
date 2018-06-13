@@ -1,7 +1,7 @@
 <?php
 namespace Poirot\NavMenu\Builder;
 
-use Poirot\NavMenu\NavigationMenu;
+use Poirot\NavMenu\Navigation;
 use Poirot\Std\ConfigurableSetter;
 use Poirot\Std\Interfaces\Pact\ipBuilder;
 use Poirot\Std\Interfaces\Pact\ipFactory;
@@ -56,14 +56,14 @@ class BuildMenu
      * Factory With Valuable Parameter
      *
      * @param mixed          $valuable
-     * @param NavigationMenu $navigation
+     * @param Navigation $navigation
      *
      * @return mixed
      */
     static function of($valuable = null, $navigation = null)
     {
         if ($navigation === null)
-            $navigation = new NavigationMenu;
+            $navigation = new Navigation;
 
         $self = new self($valuable);
         $self->build($navigation);
@@ -81,7 +81,7 @@ class BuildMenu
      *
      * @return mixed
      */
-    function build(NavigationMenu $navigation)
+    function build(Navigation $navigation)
     {
         $this->_buildDefaultSettings($navigation);
 
@@ -129,7 +129,7 @@ class BuildMenu
     /**
      * Build Default Settings
      *
-     * @param NavigationMenu $navigation
+     * @param Navigation $navigation
      */
     protected function _buildDefaultSettings($navigation)
     {
@@ -144,7 +144,7 @@ class BuildMenu
     /**
      * Build Menus
      *
-     * @param NavigationMenu $navigation
+     * @param Navigation $navigation
      */
     protected function _buildMenus($navigation)
     {
@@ -154,7 +154,7 @@ class BuildMenu
             $order    = null;
             $settings = [];
 
-            if (! $m instanceof NavigationMenu )
+            if (! $m instanceof Navigation )
             {
                 if ($m instanceof \Traversable)
                     $m = StdTravers::of($m)->toArray(null, true);
@@ -171,15 +171,8 @@ class BuildMenu
 
                 // Class
                 $class = $m['class'];
-                if (! is_object($class) ) {
-                    if (! class_exists($class) )
-                        throw new \InvalidArgumentException(sprintf(
-                            'Class (%s) Not Found.'
-                            , $m
-                        ));
-
-                    $class = new $class;
-                }
+                if (! is_object($class) )
+                    $class = $this->_newMenuFromName($class);
 
                 $settings = $m['settings'] ?? [];
             }
@@ -188,5 +181,17 @@ class BuildMenu
             $class = self::of($settings, $class);
             $navigation->addMenu($class, $order);
         }
+    }
+
+    protected function _newMenuFromName($class)
+    {
+        if (! class_exists($class) )
+            throw new \InvalidArgumentException(sprintf(
+                'Class (%s) Not Found.'
+                , $class
+            ));
+
+
+        return new $class;
     }
 }

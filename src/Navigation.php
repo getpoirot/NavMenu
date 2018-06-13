@@ -1,5 +1,6 @@
 <?php
 namespace Poirot\NavMenu;
+
 use Poirot\NavMenu\Builder\BuildMenu;
 use Poirot\Std\Exceptions\exImmutable;
 use Poirot\Std\Struct\CollectionObject;
@@ -9,12 +10,14 @@ use Poirot\Std\Struct\CollectionObject;
  * Add Some Menu To Holder As Group Of Menus
  *
  */
-class NavigationMenu
+class Navigation
     implements \Countable
     , \RecursiveIterator
 {
     /** @var PriorityObjectCollection */
     protected $collection;
+    /** @var BuildMenu */
+    protected $builder;
     protected $defaultSettings = [];
 
 
@@ -30,7 +33,7 @@ class NavigationMenu
     {
         ## Build Menu With Default Settings
         #
-        BuildMenu::of(
+        $this->getBuilder()->of(
             $this->getDefaultSettings()
             , $menu
         );
@@ -64,6 +67,35 @@ class NavigationMenu
         }
 
         return $this;
+    }
+
+    /**
+     * Menu Builder
+     *
+     * @param BuildMenu $builder
+     *
+     * @return $this
+     */
+    function giveMenuBuilder(BuildMenu $builder)
+    {
+        if ( $this->builder )
+            throw new exImmutable('Builder Is Immutable.');
+
+        $this->builder = $builder;
+        return $this;
+    }
+
+    /**
+     * Builder
+     *
+     * @return BuildMenu
+     */
+    function getBuilder()
+    {
+       if (! $this->builder )
+           $this->builder = new BuildMenu;
+
+        return $this->builder;
     }
 
     /**
@@ -119,7 +151,7 @@ class NavigationMenu
      */
     function current()
     {
-        $this->_collection()->current();
+        return $this->_collection()->current();
     }
 
     /**
@@ -127,7 +159,7 @@ class NavigationMenu
      */
     function next()
     {
-        $this->_collection()->next();
+        return $this->_collection()->next();
     }
 
     /**
@@ -135,7 +167,7 @@ class NavigationMenu
      */
     function key()
     {
-        $this->_collection()->key();
+        return $this->_collection()->key();
     }
 
     /**
@@ -143,7 +175,7 @@ class NavigationMenu
      */
     function valid()
     {
-        $this->_collection()->valid();
+        return $this->_collection()->valid();
     }
 
     /**

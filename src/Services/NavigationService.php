@@ -2,7 +2,7 @@
 namespace Poirot\NavMenu\Services;
 
 use Poirot\Ioc\Container\Service\aServiceContainer;
-use Poirot\NavMenu\NavigationMenu;
+use Poirot\NavMenu\Navigation;
 
 
 class NavigationService
@@ -14,7 +14,7 @@ class NavigationService
     /**
      * Create Service
      *
-     * @return NavigationMenu
+     * @return Navigation
      */
     function newService()
     {
