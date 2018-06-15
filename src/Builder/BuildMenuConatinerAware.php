@@ -2,6 +2,7 @@
 namespace Poirot\NavMenu\Builder;
 
 use Poirot\Ioc\Container;
+use Poirot\Ioc\instance;
 
 /*
 $navigation = BuildMenu::of([
@@ -43,13 +44,13 @@ class BuildMenuContainerAware
 
     // ..
 
-    protected function _newMenuFromName($class)
+    protected function _newMenuFromName($class, $settings)
     {
         if (! $this->sc->has($class) )
-            return parent::_newMenuFromName($class);
+            return \Poirot\Ioc\newInitIns( new instance($class, $settings), $this->sc );
 
 
-        $menu = $this->sc->get($class);
+        $menu = $this->sc->get($class, $settings);
         return $menu;
     }
 }

@@ -15,16 +15,6 @@ class MenuUri
     protected $request;
 
 
-    /**
-     * MenuUri constructor.
-     *
-     * @param iHttpRequest $httpRequest
-     */
-    function __construct(iHttpRequest $httpRequest = null)
-    {
-        $this->setRequest($httpRequest);
-    }
-
 
     /**
      * Returns href for this page

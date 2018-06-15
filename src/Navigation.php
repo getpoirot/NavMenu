@@ -1,9 +1,8 @@
 <?php
 namespace Poirot\NavMenu;
 
-use Poirot\NavMenu\Builder\BuildMenu;
-use Poirot\Std\Exceptions\exImmutable;
-use Poirot\Std\Struct\CollectionObject;
+use Poirot\Std\ConfigurableSetter;
+use Poirot\NavMenu\Collection\PriorityObjectCollection;
 
 
 /**
@@ -11,14 +10,12 @@ use Poirot\Std\Struct\CollectionObject;
  *
  */
 class Navigation
+    extends ConfigurableSetter
     implements \Countable
     , \RecursiveIterator
 {
     /** @var PriorityObjectCollection */
     protected $collection;
-    /** @var BuildMenu */
-    protected $builder;
-    protected $defaultSettings = [];
 
 
     /**
@@ -31,16 +28,6 @@ class Navigation
      */
     function addMenu(aMenu $menu, $order = null)
     {
-        ## Build Menu With Default Settings
-        #
-        $this->getBuilder()->of(
-            $this->getDefaultSettings()
-            , $menu
-        );
-
-
-        ## Add Menu To Collection
-        #
         $this->_collection()->insert($menu, ['sort' => $order]);
 
         return $this;
@@ -53,8 +40,10 @@ class Navigation
      *
      * @return $this
      */
-    function addMenus($menus)
+    function setMenus($menus)
     {
+        $this->_collection()->clean();
+
         foreach ($menus as $menu)
         {
             $order = null;
@@ -69,76 +58,18 @@ class Navigation
         return $this;
     }
 
-    /**
-     * Menu Builder
-     *
-     * @param BuildMenu $builder
-     *
-     * @return $this
-     */
-    function giveMenuBuilder(BuildMenu $builder)
-    {
-        if ( $this->builder )
-            throw new exImmutable('Builder Is Immutable.');
-
-        $this->builder = $builder;
-        return $this;
-    }
-
-    /**
-     * Builder
-     *
-     * @return BuildMenu
-     */
-    function getBuilder()
-    {
-       if (! $this->builder )
-           $this->builder = new BuildMenu;
-
-        return $this->builder;
-    }
-
-    /**
-     * Set Default Settings
-     *
-     * - some settings are default for container such as class, etc..
-     *
-     * @param array $settings
-     *
-     * @return $this
-     */
-    function giveDefaultSettings(array $settings)
-    {
-        if ( $this->defaultSettings )
-            throw new exImmutable('Default Settings Is Immutable.');
-
-
-        $this->defaultSettings = $settings;
-        return $this;
-    }
-
-    /**
-     * Get Default Settings
-     *
-     * @return array
-     */
-    function getDefaultSettings()
-    {
-        return $this->defaultSettings;
-    }
-
 
     // ..
 
     /**
      * Collection Object
      *
-     * @return CollectionObject
+     * @return PriorityObjectCollection
      */
     protected function _collection()
     {
         if (! $this->collection )
-            $this->collection = new CollectionObject;
+            $this->collection = new PriorityObjectCollection;
 
         return $this->collection;
     }
@@ -159,7 +90,7 @@ class Navigation
      */
     function next()
     {
-        return $this->_collection()->next();
+        $this->_collection()->next();
     }
 
     /**
@@ -210,6 +141,6 @@ class Navigation
      */
     function count()
     {
-        $this->_collection()->count();
+        return $this->_collection()->count();
     }
 }

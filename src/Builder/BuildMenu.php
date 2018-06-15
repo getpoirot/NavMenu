@@ -83,8 +83,6 @@ class BuildMenu
      */
     function build(Navigation $navigation)
     {
-        $this->_buildDefaultSettings($navigation);
-
         $this->_buildMenus($navigation);
     }
 
@@ -127,39 +125,29 @@ class BuildMenu
     // Builds:
 
     /**
-     * Build Default Settings
-     *
-     * @param Navigation $navigation
-     */
-    protected function _buildDefaultSettings($navigation)
-    {
-        $settings = $this->defaultSettings;
-        if (! is_array($settings) )
-            $settings = StdTravers::of($settings)->toArray(null, true);
-
-
-        $navigation->giveDefaultSettings($settings);
-    }
-
-    /**
      * Build Menus
      *
      * @param Navigation $navigation
      */
     protected function _buildMenus($navigation)
     {
+        $defaultSettings = $this->defaultSettings;
+
+
         foreach ($this->menus as $m)
         {
             $class    = $m;
             $order    = null;
-            $settings = [];
 
             if (! $m instanceof Navigation )
             {
                 if ($m instanceof \Traversable)
                     $m = StdTravers::of($m)->toArray(null, true);
 
-                if (! isset($m['class']) )
+
+                $m = array_merge($defaultSettings, $m);
+
+                if (! isset($m['_class']) )
                     throw new \InvalidArgumentException(
                         '"_class" field on menu setting is required. given:(%s).'
                         , \Poirot\Std\flatten($m)
@@ -167,23 +155,33 @@ class BuildMenu
 
 
                 // Order
-                (!isset($m['order'])) ?: $order = $m['order'];
+                (!isset($m['_order'])) ?: $order = $m['_order'];
+                unset($m['_order']);
 
                 // Class
-                $class = $m['class'];
-                if (! is_object($class) )
-                    $class = $this->_newMenuFromName($class);
+                $class = $m['_class'];
+                unset($m['_class']);
 
-                $settings = $m['settings'] ?? [];
+                // Menus
+                $settings = $m;
+                $menus = [];
+                if ( isset($settings['menus']) ) {
+                    $menus = $settings['menus'];
+                    unset($settings['menus']);
+                }
+
+                if (! is_object($class) )
+                    $class = $this->_newMenuFromName($class, $settings);
+
+                $class = static::of(['menus' => $menus, 'default_settings' => $defaultSettings], $class);
             }
 
 
-            $class = self::of($settings, $class);
             $navigation->addMenu($class, $order);
         }
     }
 
-    protected function _newMenuFromName($class)
+    protected function _newMenuFromName($class, $settings)
     {
         if (! class_exists($class) )
             throw new \InvalidArgumentException(sprintf(
@@ -192,6 +190,7 @@ class BuildMenu
             ));
 
 
-        return new $class;
+        $menu = new $class($settings);
+        return $menu;
     }
 }

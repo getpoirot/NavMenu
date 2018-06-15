@@ -1,6 +1,7 @@
 <?php
-namespace Poirot\NavMenu;
+namespace Poirot\NavMenu\Collection;
 
+use Poirot\NavMenu\aMenu;
 use Poirot\Std\Struct\CollectionObject;
 
 
@@ -56,7 +57,7 @@ class PriorityObjectCollection
         current($this->index);
         $hash = key($this->index);
 
-        return $this->find(['etag' => $hash]);
+        return $this->findOne(['etag' => $hash]);
     }
 
     /**
