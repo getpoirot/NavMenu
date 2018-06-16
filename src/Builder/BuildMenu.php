@@ -11,17 +11,23 @@ use Poirot\Std\Type\StdTravers;
 $navigation = BuildMenu::of([
     'menus' => [
         [
-            'class' => MenuUri::class,
-            'order' => 10,
-            'settings' => [
-                'href' => 'http://google.com',
+            '_class' => MenuUri::class,
+            '_order' => 10,
+            'title' => 'Google',
+            'href'  => 'http://google.com',
+            'menus' => [
+                [
+                    '_class' => MenuUri::class,
+                    'title' => 'Mail',
+                    'href'  => 'http://mail.google.com',
+                ]
             ],
         ],
     ],
     'default_settings' => [
         'class' => 'menu-item',
     ],
-], new NavigationMenu );
+], new Navigation );
 */
 
 class BuildMenu
