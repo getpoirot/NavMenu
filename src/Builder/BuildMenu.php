@@ -10,15 +10,19 @@ use Poirot\Std\Type\StdTravers;
 $navigation = BuildMenu::of([
     'menus' => [
         [
-            '_instance' => MenuUri::class,
-            '_order' => 10,
-            'title' => 'Google',
-            'href'  => 'http://google.com',
+            'instance' => 'route',
+            'label'     => 'دشبورد',
+            'route_name' => 'main/dgfadmin.admin/dashboard',
+        ],
+        [
+            'instance' => 'uri',
+            'label'     => 'وضعیت سیستم',
+            'href'      => '#',
             'menus' => [
                 [
-                    '_instance' => MenuUri::class,
-                    'title' => 'Mail',
-                    'href'  => 'http://mail.google.com',
+                    'instance' => 'route',
+                    'label' => 'وضعیت Queue Workers',
+                    'route_name' => 'main/dgfadmin.admin/dashboard',
                 ]
             ],
         ],
@@ -135,6 +139,9 @@ class BuildMenu
     protected function _buildMenus($navigation)
     {
         $defaultSettings = $this->defaultSettings;
+        $keepSettings    = [
+            'default_settings' => $defaultSettings,
+        ];
 
 
         foreach ($this->menus as $m)
@@ -150,7 +157,7 @@ class BuildMenu
 
                 $m = array_merge($defaultSettings, $m);
 
-                if (! isset($m['_instance']) )
+                if (! isset($m['instance']) )
                     throw new \InvalidArgumentException(
                         '"_instance" field on menu setting is required. given:(%s).'
                         , \Poirot\Std\flatten($m)
@@ -158,20 +165,26 @@ class BuildMenu
 
 
                 // Order
-                (!isset($m['_order'])) ?: $order = $m['_order'];
-                unset($m['_order']);
+                (!isset($m['order'])) ?: $order = $m['order'];
+                unset($m['order']);
 
                 // Class
-                $class = $m['_instance'];
-                unset($m['_instance']);
+                $class = $m['instance'];
+                unset($m['instance']);
 
                 // Menus
-                $settings = array_merge($m, ['default_settings' => $defaultSettings]);
+                $settings = $m;
+                if ( isset($settings['menus']) ) {
+                    $menus = $settings['menus'];
+                    $keepSettings['menus'] = $menus;
+                    unset($settings['menus']);
+                }
 
                 if (! is_object($class) )
                     $class = $this->_newMenuFromName($class, $settings);
 
-                $class = static::of($settings, $class);
+
+                $class = static::of($keepSettings, $class);
             }
 
 

@@ -12,7 +12,11 @@ use Poirot\NavMenu\Services\Plugins\ContainerMenusCapped;
 use Poirot\Std\Struct\DataEntity;
 
 
-class NavigationService
+/**
+ * !! Note: Navigation Classes Must Extend This
+ *
+ */
+abstract class aNavigationService
     extends aServiceContainer
 {
     /** @var array */
@@ -26,19 +30,11 @@ class NavigationService
      *
      * @return Navigation
      */
-    function newService()
+    final function newService()
     {
         $plugins    = $this->_getMenusPlugin();
         $settings   = $this->_getSettings();
-        $settings   = array_merge(
-            [
-                'container' => $plugins,
-                'default_settings' => [
-                    'container' => $plugins,
-                ]
-            ],
-            $settings
-        );
+        $settings   = [ 'menu_plugins' => $plugins ] + $settings ;
 
         $navigation = BuildMenuContainerAware::of(
             $settings
