@@ -3,7 +3,6 @@ namespace Poirot\NavMenu\Builder;
 
 use Poirot\NavMenu\Navigation;
 use Poirot\Std\ConfigurableSetter;
-use Poirot\Std\Interfaces\Pact\ipBuilder;
 use Poirot\Std\Interfaces\Pact\ipFactory;
 use Poirot\Std\Type\StdTravers;
 
@@ -11,13 +10,13 @@ use Poirot\Std\Type\StdTravers;
 $navigation = BuildMenu::of([
     'menus' => [
         [
-            '_class' => MenuUri::class,
+            '_instance' => MenuUri::class,
             '_order' => 10,
             'title' => 'Google',
             'href'  => 'http://google.com',
             'menus' => [
                 [
-                    '_class' => MenuUri::class,
+                    '_instance' => MenuUri::class,
                     'title' => 'Mail',
                     'href'  => 'http://mail.google.com',
                 ]
@@ -32,8 +31,7 @@ $navigation = BuildMenu::of([
 
 class BuildMenu
     extends ConfigurableSetter
-    implements ipBuilder
-    , ipFactory
+    implements ipFactory
 {
     protected $menus = [];
     protected $defaultSettings = [];
@@ -50,7 +48,6 @@ class BuildMenu
         $this->putBuildPriority([
             'default_settings',
         ]);
-
 
         parent::__construct($options);
     }
@@ -71,7 +68,7 @@ class BuildMenu
         if ($navigation === null)
             $navigation = new Navigation;
 
-        $self = new self($valuable);
+        $self = new static($valuable);
         $self->build($navigation);
 
         return $navigation;
@@ -153,9 +150,9 @@ class BuildMenu
 
                 $m = array_merge($defaultSettings, $m);
 
-                if (! isset($m['_class']) )
+                if (! isset($m['_instance']) )
                     throw new \InvalidArgumentException(
-                        '"_class" field on menu setting is required. given:(%s).'
+                        '"_instance" field on menu setting is required. given:(%s).'
                         , \Poirot\Std\flatten($m)
                     );
 
@@ -165,21 +162,16 @@ class BuildMenu
                 unset($m['_order']);
 
                 // Class
-                $class = $m['_class'];
-                unset($m['_class']);
+                $class = $m['_instance'];
+                unset($m['_instance']);
 
                 // Menus
-                $settings = $m;
-                $menus = [];
-                if ( isset($settings['menus']) ) {
-                    $menus = $settings['menus'];
-                    unset($settings['menus']);
-                }
+                $settings = array_merge($m, ['default_settings' => $defaultSettings]);
 
                 if (! is_object($class) )
                     $class = $this->_newMenuFromName($class, $settings);
 
-                $class = static::of(['menus' => $menus, 'default_settings' => $defaultSettings], $class);
+                $class = static::of($settings, $class);
             }
 
 

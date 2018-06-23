@@ -34,17 +34,19 @@ class BuildMenuContainerAware
     protected $sc;
 
 
-    /**
-     * Construct
-     *
-     * @param Container          $locator
-     * @param array|\Traversable $options
-     */
-    function __construct(Container $locator, $options = null)
-    {
-        $this->sc = $locator;
+    // Options:
 
-        parent::__construct($options);
+    /**
+     * Set Container
+     *
+     * @param Container $sc
+     *
+     * @return $this
+     */
+    function setContainer(Container $sc)
+    {
+        $this->sc = $sc;
+        return $this;
     }
 
 
